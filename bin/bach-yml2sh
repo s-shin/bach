@@ -1,0 +1,35 @@
+#!/usr/bin/env ruby
+require 'yaml'
+require 'optparse'
+
+def puts_sh_kv(key, value)
+  escaped_value = value.to_s.gsub(/"/, '\\"')
+  puts %(function #{key}() { echo "#{escaped_value}"; })
+end
+
+def print_sh(data, key_prefix: '')
+  data.each do |key, value|
+    key_path = "#{key_prefix}#{key}"
+    case value
+    when Hash
+      print_sh value, key_prefix: key_path + '.'
+    when Array
+      puts_sh_kv key_path, value.join("\t")
+    else
+      puts_sh_kv key_path, value
+    end
+  end
+end
+
+def main
+  opts = {
+    prefix: ''
+  }
+  parser = OptionParser.new
+  parser.on('-p VAL', '--prefix=VAL') { |v| opts[:prefix] = v }
+  parser.parse!(ARGV)
+
+  print_sh YAML.load(ARGF.read), key_prefix: opts[:prefix]
+end
+
+main

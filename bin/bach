@@ -1,0 +1,17 @@
+#!/bin/bash
+set -eu
+
+root="$(cd "$(dirname "${BASH_SOURCE:-$0}")"; pwd)/.."
+
+cat <<EOT
+BACH_ROOT='${root}'
+BACH_VERSION="0.0.1"
+BACH_AUTHOR='Shintaro Seki <s2pch.luck@gmail.com>'
+BACH_LICENSE='MIT'
+EOT
+
+builtin_libs=(module session)
+
+for lib in "${builtin_libs[@]}"; do
+  cat "${root}/lib/_${lib}.sh"
+done
